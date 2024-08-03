@@ -1,6 +1,7 @@
 import 'package:ecom_2/lib/Widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
@@ -204,31 +205,42 @@ class HomeScreen extends StatelessWidget {
                 ).paddingOnly(right: 10, left: 10),
                 Container(
                   height: Get.height / 8,
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: categories.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        var item = categories[index];
-                        return Column(
-                          children: [
-                            Container(
-                              height: 50.h,
-                              width: 50.w,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: AssetImage(
-                                          item["image"].toString()))),
-                            ), //sliderimage_3
-                            Text(
-                              item["name"].toString(),
-                              style: TextStyle(
-                                  fontSize: 12, color: AppColor.black),
-                            )
-                          ],
-                        ).paddingAll(10);
-                      }),
+                  child: AnimationLimiter(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: categories.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          var item = categories[index];
+                          return AnimationConfiguration.staggeredList(
+                            position: index,
+                            duration: Duration(milliseconds: 375),
+                            child: SlideAnimation(
+                              horizontalOffset: 200.0,
+                              child: FadeInAnimation(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 50.h,
+                                      width: 50.w,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  item["image"].toString()))),
+                                    ), //sliderimage_3
+                                    Text(
+                                      item["name"].toString(),
+                                      style: TextStyle(
+                                          fontSize: 12, color: AppColor.black),
+                                    )
+                                  ],
+                                ).paddingAll(10),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
                 ),
               ],
             ),
@@ -270,52 +282,65 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ).paddingOnly(right: 10, left: 10),
                 addVerticalSpace(5),
-                GridView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: product.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 0.0,
-                        mainAxisSpacing: 0.0,
-                        childAspectRatio: 1.0 / 1.1),
-                    itemBuilder: (context, index) {
-                      var item = product[index];
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: AppColor.white,
-                        ),
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                height: 80.h,
-                                width: 80.w,
+                AnimationLimiter(
+                  child: GridView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: product.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 0.0,
+                          mainAxisSpacing: 0.0,
+                          childAspectRatio: 1.0 / 1.1),
+                      itemBuilder: (context, index) {
+                        var item = product[index];
+                        return
+                          AnimationConfiguration.staggeredGrid(
+                            position: index,
+                            duration: Duration(milliseconds: 370),
+                            columnCount: 3,
+                            child: ScaleAnimation(
+                              child:
+                              FadeInAnimation(
+                                child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
-                                  image: DecorationImage(
-                                    image: AssetImage(item["image"].toString()),
-                                    fit: BoxFit.cover,
-                                  ),
+                                  color: AppColor.white,
                                 ),
-                              ).paddingOnly(top: 10),
-                            ),
-                            Expanded(
-                              // flex: 0,
-                              child: Text(
-                                item["name"].toString(),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        height: 80.h,
+                                        width: 80.w,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(5),
+                                          image: DecorationImage(
+                                            image: AssetImage(item["image"].toString()),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ).paddingOnly(top: 10),
+                                    ),
+                                    Expanded(
+                                      // flex: 0,
+                                      child: Text(
+                                        item["name"].toString(),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                        ).paddingSymmetric(horizontal: 5, vertical: 5),
                               ),
-                            )
-                          ],
-                        ),
-                      ).paddingSymmetric(horizontal: 5, vertical: 5);
-                    }),
+                            ),
+                          );
+                      }),
+                ),
               ]).paddingSymmetric(horizontal: 15, vertical: 10)),
           Container(
             decoration: BoxDecoration(
@@ -383,98 +408,112 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          MasonryGridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 0,
-            crossAxisSpacing: 0,
-            itemCount: product_3.length,
-            scrollDirection: Axis.vertical,
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              var item =product_3[index];
-              return Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColor.grey),
-                ),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        decoration:BoxDecoration(
-                          color: item["off"].toString() == "20"?AppColor.green: Colors.yellow,
-                      borderRadius: BorderRadius.circular(3)
-                ),
-                        child: Text(item["off"].toString()+" Off",style: TextStyle(
-                          fontSize: 9,
-                          color: AppColor.white
-                        ),).paddingSymmetric(horizontal: 10,vertical: 1),
-                      ).paddingOnly(top: 10,left: 10),
-                    ),
-                    Image.asset(item["image"].toString(),height: 200,width: 100,),
-                    Column(
-                      children: [
-                        Text(item["name"].toString()),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
+          AnimationLimiter(
+            child: MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 0,
+              itemCount: product_3.length,
+              scrollDirection: Axis.vertical,
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                var item =product_3[index];
+                return
+                  AnimationConfiguration.staggeredList(
+                    position: index,
+                    child:
+                    SlideAnimation(
+                      verticalOffset: 50.0,
+                      duration: Duration(milliseconds: 500),
+                      child: FadeInAnimation(
+                        child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColor.grey),
+                        ),
+                        child: Column(
                           children: [
-                            Text.rich(
-                              TextSpan(
-                                children: <InlineSpan>[
-                                  TextSpan(
-                                    text: item["price"],
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                decoration:BoxDecoration(
+                                  color: item["off"].toString() == "20"?AppColor.green: Colors.yellow,
+                              borderRadius: BorderRadius.circular(3)
+                        ),
+                                child: Text(item["off"].toString()+" Off",style: TextStyle(
+                                  fontSize: 9,
+                                  color: AppColor.white
+                                ),).paddingSymmetric(horizontal: 10,vertical: 1),
+                              ).paddingOnly(top: 10,left: 10),
+                            ),
+                            Image.asset(item["image"].toString(),height: 200,width: 100,),
+                            Column(
+                              children: [
+                                Text(item["name"].toString()),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  children: [
+                                    Text.rich(
+                                      TextSpan(
+                                        children: <InlineSpan>[
+                                          TextSpan(
+                                            text: "₹"+item["price"],
+                                            style: TextStyle(color: AppColor.primaryColor)
+                                          ),
+                                          const WidgetSpan(
+                                            child: SizedBox(
+                                              width: 8, // Adjust the width to your desired spacing
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "₹"+"2000",
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                              decoration: TextDecoration
+                                                  .lineThrough,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Container(
+                                  height:20.h,
+                                  width:Get.width/3.h,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: AppColor.primaryColor
                                   ),
-                                  const WidgetSpan(
-                                    child: SizedBox(
-                                      width: 8, // Adjust the width to your desired spacing
-                                    ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.add,size: 15,color: AppColor.white,),
+                                      addHorizontalspaceSpace(5),
+                                      Text("Add to cart",style: TextStyle(color: AppColor.white,fontSize: 12),),
+                                    ],
                                   ),
-                                  TextSpan(
-                                    text: "2000",
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                      decoration: TextDecoration
-                                          .lineThrough,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                addVerticalSpace(20),
+                              ],
                             )
                           ],
                         ),
-                        Container(
-                          height:20.h,
-                          width:Get.width/3.h,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: AppColor.primaryColor
-                          ),
-                          child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.center,
-                            crossAxisAlignment:
-                            CrossAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add,size: 15,color: AppColor.white,),
-                              addHorizontalspaceSpace(5),
-                              Text("Add to cart",style: TextStyle(color: AppColor.white,fontSize: 12),),
-                            ],
-                          ),
-                        ),
-                        addVerticalSpace(20),
-                      ],
-                    )
-                  ],
                 ),
-              );
-            },
-          ).paddingSymmetric(horizontal: 15,vertical: 15)
+                      ),
+                    ),
+                  );
+              },
+            ).paddingSymmetric(horizontal: 15,vertical: 15),
+          )
         ],
       ),
       bottomNavigationBar: bottomBar(context: context, index: 0),
